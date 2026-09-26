@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0710">
+<title>PRIVATE AI — DEMO</title>
+<style>
+:root{
+  --bg:#0b0710;--panel:#15101d;--panel2:#1d1427;--text:#f7efff;--muted:#9d8faa;
+  --accent:#ff2fa8;--accent2:#8d4dff;--line:#2c2138;--ok:#7bf7c7;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at top,#24152f 0,#0b0710 42%);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+.app{max-width:430px;margin:auto;min-height:100vh;display:flex;flex-direction:column;padding-bottom:84px}
+header{padding:18px 18px 10px;position:sticky;top:0;background:linear-gradient(#0b0710ee,#0b0710bb,transparent);backdrop-filter:blur(14px);z-index:3}
+.brand{display:flex;align-items:center;justify-content:space-between}
+.brand h1{font-size:19px;margin:0;letter-spacing:.12em}
+.badge{font-size:11px;padding:5px 9px;border:1px solid #ff2fa877;border-radius:999px;color:#ff8ad0;background:#ff2fa811}
+main{padding:8px 14px}
+.card{background:linear-gradient(180deg,#181120,#120d19);border:1px solid var(--line);border-radius:20px;padding:15px;margin-bottom:12px;box-shadow:0 10px 35px #0006}
+.hero{padding:18px}
+.hero h2{font-size:25px;margin:4px 0 7px}
+.hero p{color:var(--muted);margin:0;font-size:13px;line-height:1.5}
+.row{display:flex;gap:10px}
+button,input,textarea,select{font:inherit}
+.btn{border:0;border-radius:14px;padding:12px 14px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:white;font-weight:700}
+.btn.secondary{background:#21172b;color:#eee;border:1px solid var(--line)}
+.input{width:100%;background:#0f0a15;border:1px solid var(--line);color:white;border-radius:14px;padding:12px}
+textarea.input{min-height:110px;resize:vertical}
+.chat{height:410px;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:6px 1px 12px}
+.msg{max-width:84%;padding:11px 13px;border-radius:16px;line-height:1.45;font-size:14px}
+.me{align-self:flex-end;background:linear-gradient(135deg,#ff2fa8,#a14dff)}
+.ai{align-self:flex-start;background:#21172b;border:1px solid var(--line)}
+.small{font-size:12px;color:var(--muted)}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);display:grid;grid-template-columns:repeat(4,1fr);background:#0e0914f2;border-top:1px solid var(--line);backdrop-filter:blur(16px);padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:5}
+.nav button{border:0;background:transparent;color:#8e819b;padding:8px 4px;font-size:11px}
+.nav button.active{color:white}
+.tab{display:none}.tab.active{display:block}
+.avatar{width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,#ff2fa8,#5d34ff);display:grid;place-items:center;font-size:24px;font-weight:800}
+.character{display:flex;gap:12px;align-items:center}
+label{display:block;font-size:12px;color:var(--muted);margin:10px 2px 6px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.gallery{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.placeholder{aspect-ratio:3/4;border-radius:16px;border:1px solid var(--line);background:linear-gradient(145deg,#24112d,#11101d 55%,#321149);display:flex;align-items:end;padding:10px;color:#c8b8d1;font-size:11px;overflow:hidden}
+.notice{font-size:12px;color:#b8a9c3;padding:10px 12px;border:1px solid #3a2a48;background:#130d19;border-radius:12px}
+.agegate{position:fixed;inset:0;background:#09060ddf;backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;z-index:20;padding:20px}
+.agebox{max-width:390px;background:#15101d;border:1px solid #3a2a48;border-radius:24px;padding:22px}
+.agebox h2{margin-top:0}
+.hidden{display:none!important}
+.status{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:var(--ok)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--ok)}
+</style>
+</head>
+<body>
+<div class="agegate" id="gate">
+  <div class="agebox">
+    <div class="badge">PRIVATE DEMO</div>
+    <h2>18歳以上ですか？</h2>
+    <p class="small">このデモは成人ユーザー向けのプライベートAI UIです。架空の成人キャラクターのみを扱う設計です。</p>
+    <div class="row">
+      <button class="btn" style="flex:1" onclick="enter()">18歳以上</button>
+      <button class="btn secondary" style="flex:1" onclick="alert('このデモは利用できません')">18歳未満</button>
+    </div>
+  </div>
+</div>
+
+<div class="app">
+<header>
+  <div class="brand"><h1>PRIVATE AI</h1><span class="badge">DEMO</span></div>
+</header>
+
+<main>
+<section id="chat" class="tab active">
+  <div class="card hero">
+    <div class="character">
+      <div class="avatar">J</div>
+      <div><h2 style="font-size:20px;margin:0 0 3px">JOLLY</h2><div class="status"><span class="dot"></span>Demo model</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div id="messages" class="chat">
+      <div class="msg ai">やあ。これはUI確認用のデモやで。会話は端末内だけで動く疑似応答になってる。</div>
+    </div>
+    <div class="row">
+      <input id="chatInput" class="input" placeholder="メッセージ..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="btn" onclick="sendMsg()">送信</button>
+    </div>
+  </div>
+</section>
+
+<section id="create" class="tab">
+  <div class="card">
+    <h2 style="margin-top:0">Image Create</h2>
+    <div class="notice">DEMOでは画像AIには接続せず、生成カードだけ作る。実接続時はAPIキーをサーバー側だけに保存する。</div>
+    <label>Prompt</label>
+    <textarea id="prompt" class="input" placeholder="例：JOLLY、ネオンステージ、公式ゲームアート風..."></textarea>
+    <div class="grid">
+      <div><label>Aspect ratio</label><select id="ratio" class="input"><option>9:16</option><option>3:4</option><option>1:1</option></select></div>
+      <div><label>Style</label><select id="style" class="input"><option>Anime Game Art</option><option>Cinematic</option><option>Illustration</option></select></div>
+    </div>
+    <button class="btn" style="width:100%;margin-top:12px" onclick="fakeGenerate()">DEMO生成</button>
+    <div id="gallery" class="gallery"></div>
+  </div>
+</section>
+
+<section id="characters" class="tab">
+  <div class="card">
+    <h2 style="margin-top:0">Characters</h2>
+    <label>Name</label><input id="cname" class="input" value="JOLLY">
+    <div class="grid">
+      <div><label>Age</label><input id="cage" class="input" type="number" min="18" value="24"></div>
+      <div><label>Style</label><input id="cstyle" class="input" value="mischievous game master"></div>
+    </div>
+    <label>Personality</label><textarea id="cpersona" class="input">遊び心があり、挑発的だが冷静。ゲームマスターとして会話を導く。</textarea>
+    <button class="btn" style="width:100%;margin-top:12px" onclick="saveChar()">端末に保存</button>
+    <p id="charsaved" class="small"></p>
+  </div>
+</section>
+
+<section id="settings" class="tab">
+  <div class="card">
+    <h2 style="margin-top:0">Settings</h2>
+    <label>Mode</label><select class="input"><option>DEMO — no external AI</option></select>
+    <label>Local PIN</label><input id="pin" class="input" inputmode="numeric" maxlength="6" placeholder="任意 4〜6桁">
+    <button class="btn secondary" style="width:100%;margin-top:10px" onclick="savePin()">PIN保存</button>
+    <label>Privacy</label>
+    <div class="notice">履歴とキャラ設定はこのデモではlocalStorageに保存。解析・広告・共有機能はなし。</div>
+    <button class="btn secondary" style="width:100%;margin-top:12px" onclick="clearData()">ローカルデータ削除</button>
+  </div>
+</section>
+</main>
+
+<nav class="nav">
+  <button class="active" onclick="showTab('chat',this)">Chat</button>
+  <button onclick="showTab('create',this)">Create</button>
+  <button onclick="showTab('characters',this)">Characters</button>
+  <button onclick="showTab('settings',this)">Settings</button>
+</nav>
+</div>
+
+<script>
+function enter(){localStorage.setItem('pa18','1');document.getElementById('gate').classList.add('hidden')}
+if(localStorage.getItem('pa18')==='1') document.getElementById('gate').classList.add('hidden');
+
+function showTab(id,btn){
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));
+  document.getElementById(id).classList.add('active');btn.classList.add('active');
+}
+function sendMsg(){
+  const i=document.getElementById('chatInput'); const t=i.value.trim(); if(!t)return;
+  const box=document.getElementById('messages');
+  box.insertAdjacentHTML('beforeend',`<div class="msg me">${esc(t)}</div>`);
+  i.value=''; box.scrollTop=box.scrollHeight;
+  setTimeout(()=>{
+    const replies=[
+      'デモ応答やで。UI・会話テンポ・保存の感触を確認できる。',
+      'ここを実AIに差し替えると、自分専用キャラとの会話画面になる。',
+      'キャラ設定はCharactersから変えられる。今は外部送信なし。',
+      '画像生成はCreateタブで擬似生成できるで。'
+    ];
+    const r=replies[Math.floor(Math.random()*replies.length)];
+    box.insertAdjacentHTML('beforeend',`<div class="msg ai">${r}</div>`); box.scrollTop=box.scrollHeight;
+    saveChat();
+  },350);
+}
+function esc(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function saveChat(){localStorage.setItem('paChat',document.getElementById('messages').innerHTML)}
+if(localStorage.getItem('paChat')) document.getElementById('messages').innerHTML=localStorage.getItem('paChat');
+
+function fakeGenerate(){
+  const p=document.getElementById('prompt').value.trim()||'Untitled concept';
+  const r=document.getElementById('ratio').value, s=document.getElementById('style').value;
+  document.getElementById('gallery').insertAdjacentHTML('afterbegin',
+    `<div class="placeholder"><div><b>DEMO OUTPUT</b><br>${esc(p).slice(0,72)}<br><span class="small">${r} · ${s}</span></div></div>`);
+}
+function saveChar(){
+  const age=Number(document.getElementById('cage').value);
+  if(!age || age<18){alert('キャラクターは18歳以上で設定してください');return;}
+  const data={name:cname.value,age,style:cstyle.value,personality:cpersona.value};
+  localStorage.setItem('paChar',JSON.stringify(data)); charsaved.textContent='保存したで。';
+}
+const saved=localStorage.getItem('paChar'); if(saved){try{const d=JSON.parse(saved);cname.value=d.name;cage.value=d.age;cstyle.value=d.style;cpersona.value=d.personality}catch(e){}}
+function savePin(){const v=pin.value.trim(); if(v && !/^\d{4,6}$/.test(v)){alert('PINは4〜6桁の数字');return;} localStorage.setItem('paPin',v); alert('保存したで')}
+function clearData(){if(confirm('ローカル保存データを全部消す？')){localStorage.clear();location.reload()}}
+</script>
+</body>
+</html>
