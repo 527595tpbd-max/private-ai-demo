@@ -15,10 +15,10 @@ function sizeFromRatio(ratio) {
     case "1:1":
       return { width: 1024, height: 1024 };
     case "3:4":
-      return { width: 1024, height: 1365 };
+      return { width: 768, height: 1024 };
     case "9:16":
     default:
-      return { width: 1024, height: 1820 };
+      return { width: 576, height: 1024 };
   }
 }
 

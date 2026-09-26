@@ -165,7 +165,13 @@ function sendMsg(){
     saveChat();
   },350);
 }
-function esc(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function esc(s){
+  if (s === null || s === undefined) return '';
+  if (typeof s !== 'string') {
+    try { s = JSON.stringify(s); } catch(e) { s = String(s); }
+  }
+  return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+}
 function saveChat(){localStorage.setItem('paChat',document.getElementById('messages').innerHTML)}
 if(localStorage.getItem('paChat')) document.getElementById('messages').innerHTML=localStorage.getItem('paChat');
 
