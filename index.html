@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b0710">
-<title>PRIVATE AI — DEMO</title>
+<title>PRIVATE AI — LIVE</title>
 <style>
 :root{
   --bg:#0b0710;--panel:#15101d;--panel2:#1d1427;--text:#f7efff;--muted:#9d8faa;
@@ -55,19 +55,19 @@ label{display:block;font-size:12px;color:var(--muted);margin:10px 2px 6px}
 <body>
 <div class="agegate" id="gate">
   <div class="agebox">
-    <div class="badge">PRIVATE DEMO</div>
+    <div class="badge">PRIVATE LIVE</div>
     <h2>18歳以上ですか？</h2>
-    <p class="small">このデモは成人ユーザー向けのプライベートAI UIです。架空の成人キャラクターのみを扱う設計です。</p>
+    <p class="small">このアプリは成人ユーザー向けです。架空の成人キャラクターのみを扱う設計です。</p>
     <div class="row">
       <button class="btn" style="flex:1" onclick="enter()">18歳以上</button>
-      <button class="btn secondary" style="flex:1" onclick="alert('このデモは利用できません')">18歳未満</button>
+      <button class="btn secondary" style="flex:1" onclick="alert('このアプリは利用できません')">18歳未満</button>
     </div>
   </div>
 </div>
 
 <div class="app">
 <header>
-  <div class="brand"><h1>PRIVATE AI</h1><span class="badge">DEMO</span></div>
+  <div class="brand"><h1>PRIVATE AI</h1><span class="badge">LIVE</span></div>
 </header>
 
 <main>
@@ -75,12 +75,12 @@ label{display:block;font-size:12px;color:var(--muted);margin:10px 2px 6px}
   <div class="card hero">
     <div class="character">
       <div class="avatar">J</div>
-      <div><h2 style="font-size:20px;margin:0 0 3px">JOLLY</h2><div class="status"><span class="dot"></span>Demo model</div></div>
+      <div><h2 style="font-size:20px;margin:0 0 3px">JOLLY</h2><div class="status"><span class="dot"></span>Demo chat</div></div>
     </div>
   </div>
   <div class="card">
     <div id="messages" class="chat">
-      <div class="msg ai">やあ。これはUI確認用のデモやで。会話は端末内だけで動く疑似応答になってる。</div>
+      <div class="msg ai">やあ。Chatはまだデモ応答やで。Createタブは本物の画像生成に接続される。</div>
     </div>
     <div class="row">
       <input id="chatInput" class="input" placeholder="メッセージ..." onkeydown="if(event.key==='Enter')sendMsg()">
@@ -92,14 +92,14 @@ label{display:block;font-size:12px;color:var(--muted);margin:10px 2px 6px}
 <section id="create" class="tab">
   <div class="card">
     <h2 style="margin-top:0">Image Create</h2>
-    <div class="notice">DEMOでは画像AIには接続せず、生成カードだけ作る。実接続時はAPIキーをサーバー側だけに保存する。</div>
+    <div class="notice">ここはライブ接続。Renderの環境変数に NSFWINFRA_API_KEY を設定すると本物の画像生成が動く。</div>
     <label>Prompt</label>
     <textarea id="prompt" class="input" placeholder="例：JOLLY、ネオンステージ、公式ゲームアート風..."></textarea>
     <div class="grid">
       <div><label>Aspect ratio</label><select id="ratio" class="input"><option>9:16</option><option>3:4</option><option>1:1</option></select></div>
       <div><label>Style</label><select id="style" class="input"><option>Anime Game Art</option><option>Cinematic</option><option>Illustration</option></select></div>
     </div>
-    <button class="btn" style="width:100%;margin-top:12px" onclick="fakeGenerate()">DEMO生成</button>
+    <button class="btn" style="width:100%;margin-top:12px" onclick="fakeGenerate()">画像生成</button>
     <div id="gallery" class="gallery"></div>
   </div>
 </section>
@@ -121,11 +121,11 @@ label{display:block;font-size:12px;color:var(--muted);margin:10px 2px 6px}
 <section id="settings" class="tab">
   <div class="card">
     <h2 style="margin-top:0">Settings</h2>
-    <label>Mode</label><select class="input"><option>DEMO — no external AI</option></select>
+    <label>Mode</label><select class="input"><option>LIVE image / DEMO chat</option></select>
     <label>Local PIN</label><input id="pin" class="input" inputmode="numeric" maxlength="6" placeholder="任意 4〜6桁">
     <button class="btn secondary" style="width:100%;margin-top:10px" onclick="savePin()">PIN保存</button>
     <label>Privacy</label>
-    <div class="notice">履歴とキャラ設定はこのデモではlocalStorageに保存。解析・広告・共有機能はなし。</div>
+    <div class="notice">履歴とキャラ設定はlocalStorage保存。解析・広告・共有機能はなし。</div>
     <button class="btn secondary" style="width:100%;margin-top:12px" onclick="clearData()">ローカルデータ削除</button>
   </div>
 </section>
@@ -155,10 +155,10 @@ function sendMsg(){
   i.value=''; box.scrollTop=box.scrollHeight;
   setTimeout(()=>{
     const replies=[
-      'デモ応答やで。UI・会話テンポ・保存の感触を確認できる。',
-      'ここを実AIに差し替えると、自分専用キャラとの会話画面になる。',
-      'キャラ設定はCharactersから変えられる。今は外部送信なし。',
-      '画像生成はCreateタブで擬似生成できるで。'
+      'デモ応答やで。Createタブは本物の画像生成になる。',
+      'キャラ設定はCharactersから変えられる。',
+      '外部送信は画像生成時だけサーバー経由で行う。',
+      'RenderにAPIキーが入っていれば画像生成できるで。'
     ];
     const r=replies[Math.floor(Math.random()*replies.length)];
     box.insertAdjacentHTML('beforeend',`<div class="msg ai">${r}</div>`); box.scrollTop=box.scrollHeight;
@@ -169,12 +169,51 @@ function esc(s){return s.replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt
 function saveChat(){localStorage.setItem('paChat',document.getElementById('messages').innerHTML)}
 if(localStorage.getItem('paChat')) document.getElementById('messages').innerHTML=localStorage.getItem('paChat');
 
-function fakeGenerate(){
-  const p=document.getElementById('prompt').value.trim()||'Untitled concept';
-  const r=document.getElementById('ratio').value, s=document.getElementById('style').value;
-  document.getElementById('gallery').insertAdjacentHTML('afterbegin',
-    `<div class="placeholder"><div><b>DEMO OUTPUT</b><br>${esc(p).slice(0,72)}<br><span class="small">${r} · ${s}</span></div></div>`);
+async function fakeGenerate() {
+  const p = document.getElementById('prompt').value.trim();
+  const r = document.getElementById('ratio').value;
+  const s = document.getElementById('style').value;
+  const gallery = document.getElementById('gallery');
+
+  if (!p) {
+    alert('プロンプトを入れてな');
+    return;
+  }
+
+  const loading = document.createElement('div');
+  loading.className = 'placeholder';
+  loading.innerHTML = `<div><b>生成中...</b><br>${esc(p).slice(0,72)}<br><span class="small">${r} · ${s}</span></div>`;
+  gallery.prepend(loading);
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt: p, ratio: r, seed: -1 })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data.url) {
+      loading.innerHTML = `<div><b>失敗</b><br><span class="small">${esc(data.error || data.message || '生成できませんでした')}</span></div>`;
+      return;
+    }
+
+    loading.style.padding = '0';
+    loading.style.display = 'block';
+    loading.innerHTML = `
+      <img src="${data.url}" alt="generated image" style="width:100%;display:block;border-radius:16px;aspect-ratio:3/4;object-fit:cover;">
+      <div style="padding:10px;font-size:11px;color:#c8b8d1;">
+        <b>GENERATED</b><br>
+        ${esc(p).slice(0,72)}<br>
+        <span class="small">${r} · ${s}</span>
+      </div>
+    `;
+  } catch (e) {
+    loading.innerHTML = `<div><b>通信エラー</b><br><span class="small">${esc(e.message || 'error')}</span></div>`;
+  }
 }
+
 function saveChar(){
   const age=Number(document.getElementById('cage').value);
   if(!age || age<18){alert('キャラクターは18歳以上で設定してください');return;}
