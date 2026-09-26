@@ -1,99 +1,126 @@
-const express = require("express");
-const path = require("path");
-const crypto = require("crypto");
+const express = require('express');
+const multer = require('multer');
+const cors = require('cors');
 
 const app = express();
-app.use(express.json({ limit: "1mb" }));
-app.use(express.static(__dirname));
+const upload = multer({ storage: multer.memoryStorage() });
 
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+app.use(cors());
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('.'));
 
-function sizeFromRatio(ratio) {
-  switch (ratio) {
-    case "1:1":
-      return { width: 1024, height: 1024 };
-    case "3:4":
-      return { width: 768, height: 1024 };
-    case "9:16":
-    default:
-      return { width: 576, height: 1024 };
-  }
+const PORT = process.env.PORT || 3000;
+const API_KEY = process.env.NSFWINFRA_API_KEY;
+
+function styleText(style) {
+  const map = {
+    'Anime Game Art': 'high quality anime game art, polished character illustration, clean linework, detailed shading',
+    'Cinematic': 'cinematic lighting, dramatic composition, detailed scene, high impact visual',
+    'Illustration': 'stylized illustration, polished artwork, expressive detail',
+    'Realistic': 'realistic rendering, detailed skin, natural lighting, realistic proportions'
+  };
+  return map[style] || style;
 }
 
-app.post("/api/generate", async (req, res) => {
+function buildPrompt(userPrompt, style) {
+  return `${userPrompt}, ${styleText(style)}`;
+}
+
+app.post('/api/generate', async (req, res) => {
   try {
-    if (!process.env.NSFWINFRA_API_KEY) {
-      return res.status(500).json({ error: "NSFWINFRA_API_KEY not configured" });
+    if (!API_KEY) {
+      return res.status(500).json({ error: 'NSFWINFRA_API_KEY not configured' });
     }
 
-    const { prompt, ratio = "9:16", seed = -1 } = req.body || {};
-
-    if (!prompt || !prompt.trim()) {
-      return res.status(400).json({ error: "prompt required" });
+    const { prompt, aspect, style } = req.body || {};
+    if (!prompt) {
+      return res.status(400).json({ error: 'prompt is required' });
     }
 
-    const { width, height } = sizeFromRatio(ratio);
+    const finalPrompt = buildPrompt(prompt, style || 'Anime Game Art');
 
-    const createRes = await fetch("https://api.nsfwinfra.com/v1/images/generate", {
-      method: "POST",
+    const payload = {
+      prompt: finalPrompt,
+      aspect_ratio: aspect || '9:16',
+      num_images: 2
+    };
+
+    const response = await fetch('https://api.nsfwinfra.com/v1/images/generate', {
+      method: 'POST',
       headers: {
-        "Authorization": `Bearer ${process.env.NSFWINFRA_API_KEY}`,
-        "Content-Type": "application/json",
-        "Idempotency-Key": crypto.randomUUID()
+        'Authorization': `Bearer ${API_KEY}`,
+        'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        prompt,
-        model: "realistic-image-v1",
-        width,
-        height,
-        seed
-      })
+      body: JSON.stringify(payload)
     });
 
-    const createJob = await createRes.json();
-
-    if (!createRes.ok) {
-      return res.status(createRes.status).json(createJob);
+    const data = await response.json();
+    if (!response.ok) {
+      return res.status(response.status).json(data);
     }
 
-    let job = createJob;
-
-    for (let i = 0; i < 30; i++) {
-      await new Promise(r => setTimeout(r, 1500));
-
-      const pollRes = await fetch(`https://api.nsfwinfra.com/v1/jobs/${job.id}`, {
-        headers: {
-          "Authorization": `Bearer ${process.env.NSFWINFRA_API_KEY}`
-        }
-      });
-
-      job = await pollRes.json();
-
-      if (job.status === "completed") {
-        const url = job.output?.url || job.outputs?.[0]?.url;
-        return res.json({ ok: true, url, job });
-      }
-
-      if (job.status === "failed" || job.status === "cancelled") {
-        return res.status(500).json(job);
-      }
-    }
-
-    return res.status(202).json({
-      ok: false,
-      status: job.status,
-      message: "Still processing. Try again shortly."
-    });
+    const images = normalizeImages(data);
+    return res.json({ ok: true, images, raw: data });
   } catch (err) {
-    return res.status(500).json({
-      error: err.message || "server error"
-    });
+    return res.status(500).json({ error: err.message || 'generate failed' });
   }
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`PRIVATE AI running on port ${port}`);
+app.post('/api/edit', upload.array('images', 3), async (req, res) => {
+  try {
+    if (!API_KEY) {
+      return res.status(500).json({ error: 'NSFWINFRA_API_KEY not configured' });
+    }
+
+    const files = req.files || [];
+    const { prompt, aspect, style } = req.body || {};
+
+    if (!prompt) {
+      return res.status(400).json({ error: 'prompt is required' });
+    }
+    if (!files.length) {
+      return res.status(400).json({ error: 'at least one image is required' });
+    }
+
+    const form = new FormData();
+    form.append('prompt', buildPrompt(prompt, style || 'Anime Game Art'));
+    form.append('aspect_ratio', aspect || '9:16');
+    form.append('num_images', '2');
+
+    files.forEach((file, idx) => {
+      const blob = new Blob([file.buffer], { type: file.mimetype || 'image/png' });
+      form.append('images', blob, file.originalname || `image-${idx + 1}.png`);
+    });
+
+    const response = await fetch('https://api.nsfwinfra.com/v1/images/edit', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${API_KEY}`
+      },
+      body: form
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      return res.status(response.status).json(data);
+    }
+
+    const images = normalizeImages(data);
+    return res.json({ ok: true, images, raw: data });
+  } catch (err) {
+    return res.status(500).json({ error: err.message || 'edit failed' });
+  }
+});
+
+function normalizeImages(data) {
+  if (Array.isArray(data?.images)) return data.images;
+  if (Array.isArray(data?.data)) return data.data;
+  if (data?.image) return [{ image: data.image }];
+  if (data?.url) return [{ url: data.url }];
+  return [];
+}
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
